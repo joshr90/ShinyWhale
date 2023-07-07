@@ -6,46 +6,51 @@ bibliography: references.bib
 output: word_document
 ---
 
-# NARWPop
+# ShinyWhale
 
 ------------------------------------------------------------------------
 
-Estimate abundance and demographic parameters for North Atlantic right
-whales.
+Bayesian multi-state mark-recapture-recovery model
 
-### Overview
-
-------------------------------------------------------------------------
+## Overview
 
 This app is designed to provide simplified tool for estimating abundance
-and demographic information for North Atlantic right whales. With the
-use of this app, we aim to provide managers, NGOs, government
-organisations and conservationists a tool to assess the changes in the
-NARW population, without the need to understand the complete workings of
-Bayesian mark-recapture techniques, or strong programming skills. This
-app is designed to use data provided by the North Atlantic Right Whale
-Consortium, and uses their data structure to conduct the model. The
-columns required for this app are as below, please ensure that the
-column headings match:
+and demographic information using a Bayesian multi-state
+mark-recapture-recovery framework. This app was originally designed for
+North Atlantic right whales, with the aim to provide managers, NGOs,
+government organisations and conservationists a tool to assess the
+changes in the population trends, without the need to understand the
+complete workings of Bayesian mark-recapture techniques, or strong
+programming skills. The app was designed to be used with data provided
+by the North Atlantic Right Whale Consortium, and uses their data
+structure to conduct the model. The columns required for this app are as
+below, with one row for each unique sighting. Ensure that the column
+headings match:
 
-| SightingEGNo                                | SightingYear | SightingMonth | SightingDay     | Behaviors                                                            |
+| SightingEGNo                          | SightingYear | SightingMonth | SightingDay     | Behaviors                                                                                                                                           |
 |---------------|---------------|---------------|---------------|---------------|
-| Unique identifier for each individual whale | year(YYYY)   | month (MM)    | day of the year | list of behaviors for each sighting in capitals, separated by commas |
+| Unique identifier for each individual | year(YYYY)   | month (MM)    | day of the year | list of behaviors for each sighting in CAPITALS, separated by commas. Also contains information on the fate of individuals, if they were found DEAD |
 
 ------------------------------------------------------------------------
 
 **Before you start you must download [JAGS (Just Another Gibbs
 Sampler)](https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/).**
 
-##Setup
-NARWPop relies on the following packages:
--data prep: `unix`, `dplyr`,`reshape2`,`MASS`,`stringr`
--Shiny: `shiny`, `shinybusy`
--Model: `R2jags`
--Outputs: `MCMCvis`,`ggplot2`
+#### Setup
 
+ShinyWhale relies on the following packages:
 
-### Data
+-   data prep: `unix`, `dplyr`, `reshape2`, `MASS`, `stringr`
+
+-   Shiny: `shiny`, `shinybusy`
+
+-   Model: `R2jags`
+
+-   Outputs: `MCMCvis`, `ggplot2`
+
+------------------------------------------------------------------------
+
+## Data
 
 The user supplied data needs to be converted into an observation matrix
 that can be used in the Open-population Jolly-Seber framework.
@@ -59,8 +64,11 @@ a single value:
 2.  recovered dead, or
 3.  neither seen nor recovered
 
-The culmination of observations for each whale during the sampling
-periods for the study forms the capture history. The capture history is
+The culmination of observations for each individual during the sampling
+periods for the study forms the capture history. Each year of the
+capture history represents a year for the study population, which we set
+as the first month of the reproductive period, which can be set by the
+user in the *Capture Histories* tab of the app. The capture history is
 then combined with an additional period at the beginning of the study
 period where all individuals are assigned a **3** (neither seen nor
 recovered) which results in the observation matrix.
@@ -75,14 +83,16 @@ though have never been sighted. Individuals added in data augmentation
 are not all going to enter the population, but can provide more
 realistic estimates for abundance if it is believed that not every
 individual has been sighted. More information on data augmentation can
-be found here:
+be found here: [@royle2007; @royle2008; @royle2010].
 
-### Model
+------------------------------------------------------------------------
 
-The model used in NARWPop is a Bayesian multi-event Jolly-Seber
+## Model
+
+The model used in ShinyWhale is a Bayesian multi-event Jolly-Seber
 framework [@modeling2009a; @schaub2013] fit with a
-mark-recapture-recovery model [@liljestrand2019]{Lebreton, 2001 #162}.
-In the model, we considered five true biological states:
+mark-recapture-recovery model [@barker1999; @liljestrand2019]. In the
+model, we considered five true biological states:
 
 1.  not yet entered the population (NE)
 2.  alive within the study area (AI)
@@ -113,8 +123,10 @@ $$
 z_{i,2} = \varphi
 $$
 
-While the subsequent states are dependent on that state of the previous
-time period, thus the state model is denoted as:
+where $\varphi$ is the probability that an individual who has not
+already entered the population, enters. While the subsequent states are
+dependent on that state of the previous time period, thus the state
+model is denoted as:
 
 $$z_{i,t}|z_{i,t-1} = categorical(\Omega_{z~i,t},1...s,i,t)$$
 
@@ -162,3 +174,10 @@ $$
 $$
 \times [s][p][F][r][\varphi]
 $$
+
+------------------------------------------------------------------------
+
+## References
+
+::: {#refs}
+:::

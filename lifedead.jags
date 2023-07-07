@@ -1,0 +1,145 @@
+
+model {
+
+# -------------------------------------------------
+# Parameters:
+# s: true survival probability
+# F: fidelity probability
+# r: recovery probability
+# p: recapture/resighting probability
+# -------------------------------------------------
+# States (S):
+# 1 not yet entered
+# 2 alive in study area
+# 3 alive outside study area
+# 4 recently dead and recovered
+# 5 recently dead, but not recovered, or dead (absorbing)
+# Observations (O):
+# 1 seen alive
+# 2 recovered dead
+# 3 neither seen nor recovered
+# -------------------------------------------------
+
+# Priors and constraints
+
+
+  for (i in 1:nind){
+    for (t in 1:(n.occasions-1)){
+   s[i,t] <- mean.s[t]
+   F[i,t] <- mean.f[t]
+   r[i,t] <- mean.r[t]
+   p[i,t] <- mean.p[t]
+          }
+  }
+  
+  for (t in 1:(n.occasions-1)){
+    mean.s[t] ~ dunif(0, 1)     # Prior for mean survival
+    mean.f[t] ~ dunif(0, 1)     # Prior for mean fidelity
+    mean.r[t] ~ dunif(0, 1)     # Prior for mean recovery
+    mean.p[t] ~ dunif(0, 1)     # Prior for mean recapture
+    
+   gamma[t] ~ dunif(0, 1) # Prior for entry probabilities
+   gamm2[t] ~ dunif(0, 1) # prior for initial state
+  }
+
+
+# Define state-transition and observation matrices 	
+for (i in 1:nind){
+   # Define probabilities of state S(t+1) given S(t)
+   for (t in 1:(n.occasions-1)){
+      ps[1,i,t,1] <- 1-gamma[t]
+      ps[1,i,t,2] <- gamma[t]*gamm2[t]
+      ps[1,i,t,3] <- 0
+      ps[1,i,t,4] <- gamma[t]*(1-gamm2[t])
+      ps[1,i,t,5] <- 0
+      
+      ps[2,i,t,1] <- 0
+      ps[2,i,t,2] <- s[i,t]*F[i,t]
+      ps[2,i,t,3] <- s[i,t]*(1-F[i,t])
+      ps[2,i,t,4] <- (1-s[i,t])*r[i,t]
+      ps[2,i,t,5] <- (1-s[i,t])*(1-r[i,t])
+      
+      ps[3,i,t,1] <- 0
+      ps[3,i,t,2] <- 0
+      ps[3,i,t,3] <- s[i,t]
+      ps[3,i,t,4] <- (1-s[i,t])*r[i,t]
+      ps[3,i,t,5] <- (1-s[i,t])*(1-r[i,t])
+      
+      ps[4,i,t,1] <- 0
+      ps[4,i,t,2] <- 0
+      ps[4,i,t,3] <- 0
+      ps[4,i,t,4] <- 0
+      ps[4,i,t,5] <- 1
+      
+      ps[5,i,t,1] <- 0
+      ps[5,i,t,2] <- 0
+      ps[5,i,t,3] <- 0
+      ps[5,i,t,4] <- 0
+      ps[5,i,t,5] <- 1
+
+      # Define probabilities of O(t) given S(t)
+      po[1,i,t,1] <- 0
+      po[1,i,t,2] <- 0
+      po[1,i,t,3] <- 1
+      po[2,i,t,1] <- p[i,t]
+      po[2,i,t,2] <- 0
+      po[2,i,t,3] <- 1-p[i,t]
+      po[3,i,t,1] <- 0
+      po[3,i,t,2] <- 0
+      po[3,i,t,3] <- 1
+      po[4,i,t,1] <- 0
+      po[4,i,t,2] <- 1
+      po[4,i,t,3] <- 0
+      po[5,i,t,1] <- 0
+      po[5,i,t,2] <- 0
+      po[5,i,t,3] <- 1
+      } #t
+   } #i
+
+# Likelihood 
+for (i in 1:nind){
+   # Define latent state at first capture
+   z[i,1] <- 1
+   for (t in 2:n.occasions){
+      # State process: draw S(t) given S(t-1)
+      z[i,t] ~ dcat(ps[z[i,t-1], i, t-1,])
+      # Observation process: draw O(t) given S(t)
+      y[i,t] ~ dcat(po[z[i,t], i, t-1,])
+      y.new[i, t] ~ dcat(po[z[i, t], i, t-1, ])
+      } #t
+   } #i
+   # Calculate derived population parameters
+for (t in 1:(n.occasions-1)){
+   qgamma[t] <- 1-gamma[t]
+   }
+cprob[1] <- gamma[1]
+for (t in 2:(n.occasions-1)){
+   cprob[t] <- gamma[t] * prod(qgamma[1:(t-1)])
+   } #t
+psi <- sum(cprob[])            # Inclusion probability
+for (t in 1:(n.occasions-1)){
+   b[t] <- cprob[t] / psi      # Entry probability
+   } #t
+
+for (i in 1:nind){
+   for (t in 2:n.occasions){
+      al[i,t-1] <- equals(z[i,t], 2)
+      } #t
+   for (t in 1:(n.occasions-1)){
+      d[i,t] <- equals(z[i,t]-al[i,t],0)
+      } #t   
+   alive[i] <- sum(al[i,])
+   } #i
+
+for (t in 1:(n.occasions-1)){
+   N[t] <- sum(al[,t])        # Actual population size
+   B[t] <- sum(d[,t])         # Number of entries
+   } #t
+for (i in 1:nind){
+   w[i] <- 1-equals(alive[i],0)
+   } #i
+Nsuper <- sum(w[])            # Superpopulation size
+
+  
+}
+
