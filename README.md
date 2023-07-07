@@ -1,5 +1,5 @@
 
-# NARWPop
+# ShinyWhale
 
 ------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ column headings match:
 Sampler)](https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/).**
 
 ## Setup
-NARWPop relies on the following packages:
+ShinyWhale relies on the following packages:
 - data prep: `unix`, `dplyr`,`reshape2`,`MASS`,`stringr`
 - Shiny: `shiny`, `shinybusy`
 - Model: `R2jags`
