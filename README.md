@@ -1,10 +1,3 @@
----
-editor_options:
-  markdown:
-    wrap: 72
-bibliography: references.bib
-output: word_document
----
 
 # ShinyWhale
 
@@ -36,7 +29,16 @@ headings match:
 **Before you start you must download [JAGS (Just Another Gibbs
 Sampler)](https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/).**
 
+<<<<<<< HEAD
 #### Setup
+=======
+## Setup
+ShinyWhale relies on the following packages:
+- data prep: `unix`, `dplyr`,`reshape2`,`MASS`,`stringr`
+- Shiny: `shiny`, `shinybusy`
+- Model: `R2jags`
+- Outputs: `MCMCvis`,`ggplot2`
+>>>>>>> ab10649aa8124100e5eb7e886f93e4768436f5b7
 
 ShinyWhale relies on the following packages:
 
@@ -108,7 +110,7 @@ The focal temporal parameters that are estimated in this model are:
 -   dead recovery (*r*) and
 -   abundance (*N*)
 
-The state of all individuals *i* in the first occasion (*z~i,1~*) was
+The state of all individuals *i* in the first occasion ($z_{i,1}$) was
 set so that they were considered to not have entered the population
 (*NE*):
 
@@ -116,7 +118,7 @@ $$
 z_{i,1} = 1
 $$
 
-The state of individual *i* from the second occasion (*z~i,2~*) until
+The state of individual *i* from the second occasion ($z_{i,2}$) until
 they enter the population is:
 
 $$
@@ -130,20 +132,20 @@ model is denoted as:
 
 $$z_{i,t}|z_{i,t-1} = categorical(\Omega_{z~i,t},1...s,i,t)$$
 
-where z~i,t~ denotes the state of individual *i* at time *t*, and
-$\Omega_{z~i,t},1....s,i,t$ denotes state membership over time, where
+where $z_{i,t}$ denotes the state of individual *i* at time *t*, and
+$\Omega_{z_{i,t}},1....s,i,t$ denotes state membership over time, where
 *s* is the number of true states.
 
 The observation model is denoted as:
 
 $$y_{i,t}|z_{i,t-1} = categorical(\Theta_{z~i,t},1...o,i,t)$$
 
-where y~i,t~ denotes the observation of individual *i* at time *t*, and
-$\Theta_{z~i,t},1...o,i,t$ denotes the observational process, linking
-the true states z~i,t~ to the observed states y~i,t~, where *o* is the
+where $y_{i,t}$ denotes the observation of individual *i* at time *t*, and
+$\Theta_{z_{i,t}},1...o,i,t$ denotes the observational process, linking
+the true states z~i,t~ to the observed states $y_{i,t}$, where *o* is the
 number of observed states.
 
-The number of individuals entering the population at time *t* (B~t~) can
+The number of individuals entering the population at time *t* ($B_{t}$) can
 be calculated as:
 
 $$
