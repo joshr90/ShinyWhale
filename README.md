@@ -1,3 +1,10 @@
+---
+editor_options:
+  markdown:
+    wrap: 72
+bibliography: references.bib
+output: word_document
+---
 
 # ShinyWhale
 
@@ -5,10 +12,12 @@
 
 Bayesian multi-state mark-recapture-recovery model
 
-## Overview
+### Overview
 
-This app is designed to provide simplified tool for estimating abundance
-and demographic information using a Bayesian multi-state
+------------------------------------------------------------------------
+
+This app is designed to provide a simplified tool for estimating
+abundance and demographic information using a Bayesian multi-state
 mark-recapture-recovery framework. This app was originally designed for
 North Atlantic right whales, with the aim to provide managers, NGOs,
 government organisations and conservationists a tool to assess the
@@ -20,42 +29,31 @@ structure to conduct the model. The columns required for this app are as
 below, with one row for each unique sighting. Ensure that the column
 headings match:
 
-| SightingEGNo                          | SightingYear | SightingMonth | SightingDay     | Behaviors                                                                                                                                           |
+| SightingEGNo                                | SightingYear | SightingMonth | SightingDay     | Behaviors                                                                                                                                            |
 |---------------|---------------|---------------|---------------|---------------|
-| Unique identifier for each individual | year(YYYY)   | month (MM)    | day of the year | list of behaviors for each sighting in CAPITALS, separated by commas. Also contains information on the fate of individuals, if they were found DEAD |
+| Unique identifier for each individual whale | year(YYYY)   | month (MM)    | day of the year | list of behaviors for each sighting in CAPITALS, separated by commas. Also contains information on the fate of individuals, if they were found DEAD. |
 
 ------------------------------------------------------------------------
 
 **Before you start you must download [JAGS (Just Another Gibbs
 Sampler)](https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/).**
 
-<<<<<<< HEAD
-#### Setup
-=======
-## Setup
-ShinyWhale relies on the following packages:
-- data prep: `unix`, `dplyr`,`reshape2`,`MASS`,`stringr`
-- Shiny: `shiny`, `shinybusy`
-- Model: `R2jags`
-- Outputs: `MCMCvis`,`ggplot2`
->>>>>>> ab10649aa8124100e5eb7e886f93e4768436f5b7
+### Setup
 
 ShinyWhale relies on the following packages:
 
--   data prep: `unix`, `dplyr`, `reshape2`, `MASS`, `stringr`
+-   Data prep: `unix`, `dplyr`,`reshape2`,`MASS`,`stringr`
 
 -   Shiny: `shiny`, `shinybusy`
 
 -   Model: `R2jags`
 
--   Outputs: `MCMCvis`, `ggplot2`
+-   Outputs: `MCMCvis`,`ggplot2`
 
-------------------------------------------------------------------------
-
-## Data
+### Data
 
 The user supplied data needs to be converted into an observation matrix
-that can be used in the Open-population Jolly-Seber framework.
+that can be used in the open-population Jolly-Seber framework.
 
 #### Capture histories
 
@@ -68,11 +66,11 @@ a single value:
 
 The culmination of observations for each individual during the sampling
 periods for the study forms the capture history. Each year of the
-capture history represents a year for the study population, which we set
+capture history represents a year for the study population, which I set
 as the first month of the reproductive period, which can be set by the
-user in the *Capture Histories* tab of the app. The capture history is
+user in the Capture Histories tab of the app. The capture history is
 then combined with an additional period at the beginning of the study
-period where all individuals are assigned a **3** (neither seen nor
+period where all individuals are assigned a 3 (neither seen nor
 recovered) which results in the observation matrix.
 
 #### Data augmentation
@@ -87,9 +85,7 @@ realistic estimates for abundance if it is believed that not every
 individual has been sighted. More information on data augmentation can
 be found here: [@royle2007; @royle2008; @royle2010].
 
-------------------------------------------------------------------------
-
-## Model
+### Model
 
 The model used in ShinyWhale is a Bayesian multi-event Jolly-Seber
 framework [@modeling2009a; @schaub2013] fit with a
@@ -110,7 +106,7 @@ The focal temporal parameters that are estimated in this model are:
 -   dead recovery (*r*) and
 -   abundance (*N*)
 
-The state of all individuals *i* in the first occasion ($z_{i,1}$) was
+The state of all individuals *i* in the first occasion (*z~i,1~*) was
 set so that they were considered to not have entered the population
 (*NE*):
 
@@ -118,34 +114,32 @@ $$
 z_{i,1} = 1
 $$
 
-The state of individual *i* from the second occasion ($z_{i,2}$) until
+The state of individual *i* from the second occasion (*z~i,2~*) until
 they enter the population is:
 
 $$
 z_{i,2} = \varphi
 $$
 
-where $\varphi$ is the probability that an individual who has not
-already entered the population, enters. While the subsequent states are
-dependent on that state of the previous time period, thus the state
-model is denoted as:
+While the subsequent states are dependent on that state of the previous
+time period, thus the state model is denoted as:
 
 $$z_{i,t}|z_{i,t-1} = categorical(\Omega_{z~i,t},1...s,i,t)$$
 
-where $z_{i,t}$ denotes the state of individual *i* at time *t*, and
-$\Omega_{z_{i,t}},1....s,i,t$ denotes state membership over time, where
+where z~i,t~ denotes the state of individual *i* at time *t*, and
+$\Omega_{z~i,t},1....s,i,t$ denotes state membership over time, where
 *s* is the number of true states.
 
 The observation model is denoted as:
 
 $$y_{i,t}|z_{i,t-1} = categorical(\Theta_{z~i,t},1...o,i,t)$$
 
-where $y_{i,t}$ denotes the observation of individual *i* at time *t*, and
-$\Theta_{z_{i,t}},1...o,i,t$ denotes the observational process, linking
-the true states z~i,t~ to the observed states $y_{i,t}$, where *o* is the
+where y~i,t~ denotes the observation of individual *i* at time *t*, and
+$\Theta_{z~i,t},1...o,i,t$ denotes the observational process, linking
+the true states z~i,t~ to the observed states y~i,t~, where *o* is the
 number of observed states.
 
-The number of individuals entering the population at time *t* ($B_{t}$) can
+The number of individuals entering the population at time *t* (B~t~) can
 be calculated as:
 
 $$
@@ -176,10 +170,3 @@ $$
 $$
 \times [s][p][F][r][\varphi]
 $$
-
-------------------------------------------------------------------------
-
-## References
-
-::: {#refs}
-:::
