@@ -1,3 +1,14 @@
+---
+title: 'ShinyWhale: a mark-recapture tool for modeling abundance of cetaceans'
+authors:
+  - name: Joshua Reed
+    affiliation: 1
+affiliations:
+ - name: School of Natural Sciences, Macquarie University, North Ryde, NSW 2109 Australia
+   index: 1
+bibliography: paper.bib
+---
+
 # ShinyWhale
 
 ------------------------------------------------------------------------
