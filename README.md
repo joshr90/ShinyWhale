@@ -6,7 +6,7 @@ authors:
 affiliations:
  - name: School of Natural Sciences, Macquarie University, North Ryde, NSW 2109 Australia
    index: 1
-bibliography: paper.bib
+bibliography: references.bib
 ---
 
 # ShinyWhale
@@ -148,7 +148,7 @@ ShinyWhale requires you to have access to a long-term sightings catalog or recor
 ShinyWhale requires you to select the appropriate columns from your sightings data set for each of the following sections:
 
 |            Column            | Description                                                                                                                                                                                                                              |
-|:----------------------------------:|------------------------------------|
+|:----------------------------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 |             Year             | This is a column within your sighting histories that contains the information on which year each sighting was made.                                                                                                                      |
 |            Month             | This is a column within your sighting histories that contains the information on which month of the year each sighting was made.                                                                                                         |
 | Unique Identification Number | This is a column within your sightings history that contains the unique identification number for each individual.                                                                                                                       |
