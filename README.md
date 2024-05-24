@@ -37,7 +37,7 @@ The culmination of observations for each individual during the sampling periods 
 
 #### **Data augmentation**
 
-The data set can also be adjusted to include data augmentation. This is the inclusion of additional individuals into the observation matrix, who are in state 3 (neither seen nor recovered). This is to account for individuals who could exist in the population over the study period, though have never been sighted. Individuals added in data augmentation are not all going to enter the population, but can provide more realistic estimates for abundance if it is believed that not every individual has been sighted. More information on data augmentation can be found here: [@royle2008; @royle2007; @royle2010].
+The data set can also be adjusted to include data augmentation. This is the inclusion of additional individuals into the observation matrix, who are in state 3 (neither seen nor recovered). This is to account for individuals who could exist in the population over the study period, though have never been sighted. Individuals added in data augmentation are not all going to enter the population, but can provide more realistic estimates for abundance if it is believed that not every individual has been sighted. More information on data augmentation can be found here: [@royle2007; @royle2008; @royle2010].
 
 #### **Model**
 

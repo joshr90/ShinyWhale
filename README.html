@@ -11,7 +11,7 @@
 
 
 
-<title>README</title>
+<title>ShinyWhale: a mark-recapture tool for modeling abundance of cetaceans</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -251,6 +251,28 @@ if (window.hljs) {
 
 
 
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
 
 
 
@@ -348,51 +370,361 @@ display: none;
 
 
 
+<h1 class="title toc-ignore">ShinyWhale: a mark-recapture tool for
+modeling abundance of cetaceans</h1>
 
 </div>
 
 
-<div id="narwpop" class="section level1">
-<h1>NARWPop</h1>
+<div id="shinywhale" class="section level1">
+<h1>ShinyWhale</h1>
 <hr />
-<p>Estimate abundance and demographic parameters for North Atlantic
-right whales</p>
+<p>Is a Bayesian multi-state mark-recapture-recovery model</p>
+<hr />
 <div id="overview" class="section level3">
 <h3>Overview</h3>
-<hr />
-<p>This app is designed to provide simplified tool for estimating
-abundance and demographic information for North Atlantic right whales.
-With the use of this app, we aim to provide managers, NGOs, government
-organisations and conservationists a tool to assess the changes in the
-NARW population, without the need to understand the complete workings of
-Bayesian mark-recapture techniques, or strong programming skills. This
-app is designed to use data provided by the North Atlantic Right Whale
-Consortium, and uses their data structure to conduct the model. The
-columns required for this app are as below, please ensure that the
-column headings match:</p>
+<p>ShinyWhale was developed with the goal of providing a simplified tool
+in which estimates for the abundance and demographic information
+(survival, recapture, site fidelity and dead recovery) of baleen whales
+can be generated. This application was initially designed for the North
+Atlantic right whale, however the application can be applied to similar
+baleen whale species with long-term sighting histories. ShinyWhale was
+developed with the aim of providing managers, NGO’s, government
+organisations and conservationists a tool to assess the changes in
+population demographic trends, without the need to understand the
+complete workings of Bayesian mark-recapture techniques, or strong
+programming skills. More information on this model is available in the
+Github repository.</p>
+</div>
+<div id="background" class="section level3">
+<h3>Background</h3>
+<div id="capture-histories" class="section level4">
+<h4><strong>Capture histories</strong></h4>
+<p>Observations of individuals (i) in a given year (t) are compressed
+into a single value:</p>
+<ol style="list-style-type: decimal">
+<li><p>seen alive</p></li>
+<li><p>recovered dead, or</p></li>
+<li><p>neither seen nor recovered</p></li>
+</ol>
+<p>The culmination of observations for each individual during the
+sampling periods for the study forms the capture history. Each year of
+the capture history represents a year for the study population, which I
+set as the first month of the reproductive period, which can be set by
+the user in the Capture Histories tab of the app. The capture history is
+then combined with an additional period at the beginning of the study
+period where all individuals are assigned a 3 (neither seen nor
+recovered) which results in the observation matrix.</p>
+</div>
+<div id="data-augmentation" class="section level4">
+<h4><strong>Data augmentation</strong></h4>
+<p>The data set can also be adjusted to include data augmentation. This
+is the inclusion of additional individuals into the observation matrix,
+who are in state 3 (neither seen nor recovered). This is to account for
+individuals who could exist in the population over the study period,
+though have never been sighted. Individuals added in data augmentation
+are not all going to enter the population, but can provide more
+realistic estimates for abundance if it is believed that not every
+individual has been sighted. More information on data augmentation can
+be found here: <span class="citation">(Royle, Dorazio, and Link 2007;
+Royle 2008; Royle and Dorazio 2010)</span>.</p>
+</div>
+<div id="model" class="section level4">
+<h4><strong>Model</strong></h4>
+<p>The model used in ShinyWhale is a Bayesian multi-event Jolly-Seber
+framework <span class="citation">(Thomson, Cooch, and Conroy 2009;
+Schaub and Royle 2013)</span> fit with a mark-recapture-recovery model
+<span class="citation">(Barker 1999; Liljestrand, Wilberg, and Schueller
+2019)</span>. In the model, we considered five true biological
+states:</p>
+<ol style="list-style-type: decimal">
+<li><p>not yet entered the population (NE)</p></li>
+<li><p>alive within the study area (AI)</p></li>
+<li><p>alive outside the study area (AO)</p></li>
+<li><p>recovered dead (RD) and</p></li>
+<li><p>dead (D)</p></li>
+</ol>
+<p>The focal temporal parameters that are estimated in this model
+are:</p>
+<ul>
+<li><p>true survival (<em>s</em>)</p></li>
+<li><p>recapture (<em>p</em>)</p></li>
+<li><p>site fidelity (<em>F</em>)</p></li>
+<li><p>dead recovery (<em>r</em>) and</p></li>
+<li><p>abundance (<em>N</em>)</p></li>
+</ul>
+<p>The state of all individuals <span class="math inline">\(i\)</span>
+in the first occasion <span class="math inline">\((z_{i,1})\)</span> was
+set so that they were considered to not have entered the population
+(<em>NE</em>):</p>
+<p><span class="math display">\[
+z_{i,1} = 1
+\]</span></p>
+<p>The state of individual <span class="math inline">\(i\)</span> from
+the second occasion <span class="math inline">\((z_{i,2})\)</span> until
+they enter the population is:</p>
+<p><span class="math display">\[
+z_{i,2} = \varphi
+\]</span></p>
+<p>While the subsequent states are dependent on that state of the
+previous time period, thus the state model is denoted as:</p>
+<p><span class="math display">\[
+z_{i,t}|z_{i,t-1} = categorical(\Omega_{z~i,t},1...s,i,t)
+\]</span></p>
+<p>where <span class="math inline">\(z_{i,t}\)</span> denotes the state
+of individual <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span>, and <span class="math inline">\(\Omega_{z~i,t},1....s,i,t\)</span> denotes state
+membership over time, where <span class="math inline">\(s\)</span> is
+the number of true states.</p>
+<p>The observation model is denoted as:</p>
+<p><span class="math display">\[
+y_{i,t}|z_{i,t-1} = categorical(\Theta_{z~i,t},1...o,i,t)
+\]</span></p>
+<p>where <span class="math inline">\(y_{i,t}\)</span> denotes the
+observation of individual <span class="math inline">\(i\)</span> at time
+<span class="math inline">\(t\)</span>, and <span class="math inline">\(\Theta_{z~i,t},1...o,i,t\)</span> denotes the
+observational process, linking the true states <span class="math inline">\(z_{i,t}\)</span> to the observed states <span class="math inline">\(y_{i,t}\)</span>, where <span class="math inline">\(o\)</span> is the number of observed states.</p>
+<p>The number of individuals entering the population at time <span class="math inline">\(t\;(B_t)\)</span> can be calculated as:</p>
+<p><span class="math display">\[
+B_t = \sum_{i=1}^M (1 - z_{i,t-1})z_{i,t}
+\]</span></p>
+<p>while the total population size at time <span class="math inline">\(t\)</span> is:</p>
+<p><span class="math display">\[
+N_t = \sum_{i=1}^M z_{i,t}
+\]</span></p>
+<p>Therefore, the full conditional probability of the model can be
+expressed as:</p>
+<p><span class="math display">\[
+[z,s,F,r,p,\varphi|y] ∝
+\]</span></p>
+<p><span class="math display">\[
+P\{z,y|s,F,r,p,\varphi\} =
+\]</span></p>
+<p><span class="math display">\[
+\prod_{i=1}^M \prod_{t=2}^T \{z_{i,t}|z_{i,t-1},s_{i,t},F_{i,t},r_{i,t},
+\varphi_{i,t}\} \times \{y_{i,t}|z_{i,t},p_{i,t}\}
+\]</span></p>
+<p><span class="math display">\[
+\times [s][p][F][r][\varphi]
+\]</span></p>
+</div>
+</div>
+<div id="getting-started" class="section level3">
+<h3>Getting Started</h3>
+<p><strong>Before you start you must download <a href="https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/">JAGS
+(Just Another Gibbs Sampler)</a>.</strong></p>
+<p>The ShinyWhale app is divided up into tabs in order to make it easier
+to digest. The tabs are broken down into sections which are detailed
+below.</p>
+<p>ShinyWhale relies on the following packages:</p>
+<ul>
+<li><p>Data prep: <code>unix</code>, <code>dplyr</code>,
+<code>reshape2</code>, <code>MASS</code>, <code>stringr</code></p></li>
+<li><p>Shiny: <code>shiny</code>, <code>shinybusy</code></p></li>
+<li><p>Model: <code>R2jags</code></p></li>
+<li><p>Output: <code>MCMCvis</code>, <code>ggplot2</code></p></li>
+</ul>
+</div>
+<div id="data" class="section level3">
+<h3>Data</h3>
+<div id="import-data" class="section level4">
+<h4>Import Data</h4>
+<p>ShinyWhale requires you to have access to a long-term sightings
+catalog or record that is in <em>.csv</em> format. The raw data should
+be in long format, with column headings describing what each column
+contains and associated data in the corresponding rows going down. If
+the data is in the correct format, it can be uploaded to the app.</p>
+<p>ShinyWhale requires you to select the appropriate columns from your
+sightings data set for each of the following sections:</p>
 <table>
 <colgroup>
 <col width="19%" />
-<col width="20%" />
-<col width="22%" />
-<col width="19%" />
-<col width="17%" />
+<col width="80%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th>SightingEGNo</th>
-<th>SightingYear</th>
-<th>SightingMonth</th>
-<th>SightingDay</th>
-<th>Behaviors</th>
+<th align="center">Column</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
+<tr class="odd">
+<td align="center">Year</td>
+<td>This is a column within your sighting histories that contains the
+information on which year each sighting was made.</td>
+</tr>
+<tr class="even">
+<td align="center">Month</td>
+<td>This is a column within your sighting histories that contains the
+information on which month of the year each sighting was made.</td>
+</tr>
+<tr class="odd">
+<td align="center">Unique Identification Number</td>
+<td>This is a column within your sightings history that contains the
+unique identification number for each individual.</td>
+</tr>
+<tr class="even">
+<td align="center">Mortality</td>
+<td>This is a column in your sightings history that contains information
+on if you have recorded a dead whale - must be recorded as <em>DEAD</em>
+in the sighting history. This may be recorded with other information
+such as behaviors or births.</td>
+</tr>
 </tbody>
 </table>
-<hr />
-<p><strong>Before you start you must download <a href="https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/">JAGS
-(Just Another Gibbs Sampler)</a>.</strong></p>
+</div>
+<div id="capture-histories-1" class="section level4">
+<h4>Capture Histories</h4>
+<p>Now that you have the data loaded and have selected the columns that
+will be needed for the model, it is time to define some constraints for
+the data. You will need to enter or select from a drop down menu the
+response to the following questions in the app.</p>
+<ul>
+<li><p>Select the first year you want to model from - This is the year
+you want to model from. Your data set may cover a large time period, and
+perhaps you are only interested in the last decade. Perhaps your data
+set contains early records with low effort that you do not wish to
+include in your analysis.</p></li>
+<li><p>Select the last year you want to model - This is the final year
+you wish to model. You may wish to not include the final year of data
+from your data set as it includes incomplete sightings information, so
+you can just select the previous year here to exclude it.</p></li>
+<li><p>Select the month to be used as the start of the year - This is
+the month you want to be the beginning of a sighting period. This could
+be the start of the breeding or feeding period when you see most
+individuals arriving in your study area, or it could be the start of the
+calender year. What ever makes the most sense for the species you are
+trying to model.</p></li>
+<li><p>Enter the number of additional individuals you want to include
+for data augmentation - Data augmentation is a way that the model can
+account for the presence of individuals within the population, who for
+what ever reason have never been sighted. This number can be as large or
+small as makes sense for the population or species, however if too
+small, the population size may be under estimated. The number of
+individuals you enter as data augmentation will not all be added to the
+total abundance.</p></li>
+</ul>
+<p>Now that all the constraints have been set, we can now create the
+capture-history by pressing the <strong>Create capture
+histories</strong> button. This will create the capture history that you
+can view in the tab of the same name to ensure that it looks
+correct.</p>
+<p>Now we can move on to setting up the model.</p>
+</div>
+</div>
+<div id="model-1" class="section level3">
+<h3>Model</h3>
+<div id="model-settings---markov-chain-monte-carlo-mcmc" class="section level4">
+<h4>Model Settings - Markov chain Monte Carlo (MCMC)</h4>
+<p>ShinyWhale uses MCMC to sample from the data and estimate the
+parameters of interest. In order to run the MCMC we need to provide some
+basic settings for the model which will depend on the quality and
+quantity of the data being used. See below for a description of the
+different settings, and what values can be adjusted depending on the
+data that is being supplied.</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Number of iterations:</strong> The number of times you
+wanted to model to be run with the unique initial values. The model
+needs to be run for enough iterations for it to converge (reach a stable
+estimate for the parameters). We suggest a minimum of 2000 iterations
+with good sightings records, and this can be increased if sighting
+records are patchy.</p></li>
+<li><p><strong>Amount of thinning:</strong> This is how many iterations
+you wish to keep from your sample, i.e. 1 - keeps every iterations, 10 -
+keeps every ten iterations. By storing less iterations you can save on
+computer memory needed to run the model, however you can loose
+precision.</p></li>
+<li><p><strong>Number of burn-in’s:</strong> These are the initial
+iterations of the model that are when the parameter estimation is
+stabilizing. These iterations will be discarded so they wont influence
+the uncertainty surrounding the parameter estimation. We suggest this be
+a third to half the amount of iterations you have selected. If you have
+3000 iterations, set the burn-in between 1000-1500.</p></li>
+<li><p><strong>Number of chains:</strong> The number of unique starting
+points for the model. Each chain begins with a unique initial value for
+the parameters of interest. We suggest a minimum of
+<strong><em>3</em></strong> chains be used.</p></li>
+</ol>
+<p>Now that the data is prepared and we have selected the constraints
+for the model, we can now run the model by pressing the <strong>“Run
+Model”</strong> button at the bottom of the page. Once the model is
+running, a status bar will flash across the top of the page indicating
+the model is running.</p>
+<p>Once the model has finished running, a message will appear at the
+bottom of the page that will read either:</p>
+<ul>
+<li><p>Model Complete - in which case the model has successfully run and
+you can move on to the next step of retrieving the output and plotting
+the data.</p></li>
+<li><p>Rerun model - in which case the model did not successfully
+converge and will need to be rerun. If you selected a minimum of 3
+chains and no thinning (i.e. set to 1), then this problem can likely be
+fixed by increasing the number of iterations and increasing the burn-in
+period accordingly (i.e. if you add another 1000 iterations, add another
+300-500 to the burn-in).</p></li>
+</ul>
+</div>
+</div>
+<div id="output" class="section level3">
+<h3>Output</h3>
+<p>Now that the model has successfully run, you will be able to access
+the Output tabs. These tabs are all have the same structure, with a
+figure of the output and a table of the summary of the output for the
+different parameters:</p>
+<ul>
+<li><p>Abundance</p></li>
+<li><p>Survival</p></li>
+<li><p>Recapture</p></li>
+<li><p>Site Fidelity</p></li>
+<li><p>Dead Recovery</p></li>
+</ul>
+<p>For each of the different parameters, a <em>.CSV</em> can be
+downloaded of the data by clicking the “<strong>Download the
+data</strong>” button, and the plot can be downloaded by clicking the
+“<strong>save plot</strong>” button.</p>
+</div>
+<div id="references" class="section level3 unnumbered">
+<h3 class="unnumbered">References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-barker1999" class="csl-entry">
+Barker, Richard J. 1999. <span>“Joint Analysis of
+Mark<span></span>recapture, Resighting and Ring-Recovery Data with
+Age-Dependence and Marking-Effect.”</span> <em>Bird Study</em> 46
+(sup1): S82–91. <a href="https://doi.org/10.1080/00063659909477235">https://doi.org/10.1080/00063659909477235</a>.
+</div>
+<div id="ref-liljestrand2019" class="csl-entry">
+Liljestrand, Emily M., Michael J. Wilberg, and Amy M. Schueller. 2019.
+<span>“Multi-State Dead Recovery Mark-Recovery Model Performance for
+Estimating Movement and Mortality Rates.”</span> <em>Fisheries
+Research</em> 210 (February): 214–23. <a href="https://doi.org/10.1016/j.fishres.2018.10.014">https://doi.org/10.1016/j.fishres.2018.10.014</a>.
+</div>
+<div id="ref-royle2008" class="csl-entry">
+Royle, J. Andrew. 2008. <span>“Analysis of Capture-Recapture Models with
+Individual Covariates Using Data Augmentation.”</span>
+<em>Biometrics</em> 65 (1): 267–74. <a href="https://doi.org/10.1111/j.1541-0420.2008.01038.x">https://doi.org/10.1111/j.1541-0420.2008.01038.x</a>.
+</div>
+<div id="ref-royle2010" class="csl-entry">
+Royle, J. Andrew, and Robert M. Dorazio. 2010. <span>“Parameter-Expanded
+Data Augmentation for Bayesian Analysis of Capture<span></span>recapture
+Models.”</span> <em>Journal of Ornithology</em> 152 (S2): 521–37. <a href="https://doi.org/10.1007/s10336-010-0619-4">https://doi.org/10.1007/s10336-010-0619-4</a>.
+</div>
+<div id="ref-royle2007" class="csl-entry">
+Royle, J. Andrew, Robert M Dorazio, and William A Link. 2007.
+<span>“Analysis of Multinomial Models With Unknown Index Using Data
+Augmentation.”</span> <em>Journal of Computational and Graphical
+Statistics</em> 16 (1): 67–85. <a href="https://doi.org/10.1198/106186007x181425">https://doi.org/10.1198/106186007x181425</a>.
+</div>
+<div id="ref-schaub2013" class="csl-entry">
+Schaub, Michael, and J. Andrew Royle. 2013. <span>“Estimating True
+Instead of Apparent Survival Using Spatial Cormack-Jolly-Seber
+Models.”</span> Edited by Richard Barker. <em>Methods in Ecology and
+Evolution</em> 5 (12): 1316–26. <a href="https://doi.org/10.1111/2041-210x.12134">https://doi.org/10.1111/2041-210x.12134</a>.
+</div>
+<div id="ref-modeling2009a" class="csl-entry">
+Thomson, David L, Evan G. Cooch, and Michael J. Conroy, eds. 2009.
+<em>Modeling Demographic Processes in Marked Populations</em>. Springer
+US. <a href="https://doi.org/10.1007/978-0-387-78151-8">https://doi.org/10.1007/978-0-387-78151-8</a>.
+</div>
+</div>
 </div>
 </div>
 
