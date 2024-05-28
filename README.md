@@ -139,6 +139,10 @@ ShinyWhale relies on the following packages:
 
 -   Output: `MCMCvis`, `ggplot2`
 
+These packages will all be installed or loaded by running the `ipak` function in the *App.R* code. 
+
+The App relies on a number of functions to run, located in the *App_functions.R* code, this should be installed when running the code in the *App.R* function, however, if they do not, just open the *App_functions.R* code on your R session and highlight all code and run, then return to the App and try again. **Note** - this is something I am working on fixing and integrating into the App for a smoother process. 
+
 ### Data
 
 #### Import Data
