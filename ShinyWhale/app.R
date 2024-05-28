@@ -9,8 +9,6 @@
 
 requiredPackages <- c("unix","dplyr","reshape2","MASS","stringr","R2jags","MCMCvis","ggplot2","shiny","shinybusy")
 
-library(unix,dplyr,reshape2,MASS,stringr,R2jags,MCMCvis,ggplot2,shiny,shinybusy)
-
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
   if (length(new.pkg))
